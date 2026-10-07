@@ -1,11 +1,11 @@
 # AI 기반 Git 커밋 메시지·PR 초안 생성기
 
-Git 변경 사항을 읽어 COPA AI API로 커밋 메시지 또는 Pull Request 초안을 만드는 Python CLI입니다. 결과는 터미널에만 출력되며, 사용자가 검토한 뒤 직접 적용합니다.
+Git 변경 사항을 읽어 OpenAI 호환 Chat Completions API로 커밋 메시지 또는 Pull Request 초안을 만드는 Python CLI입니다. 결과는 터미널에만 출력되며, 사용자가 검토한 뒤 직접 적용합니다.
 
 ## 준비
 
 - Python 3.10 이상, Git
-- COPA virtual key
+- 제공받은 virtual key
 - 이 프로젝트를 독립적인 Git 리포지토리로 구성하고 **리포지토리 루트**에서 실행
 
 외부 Python 패키지는 필요하지 않습니다. API 키는 환경변수로 설정합니다.
@@ -27,12 +27,12 @@ python3 main.py pr --model gpt-5-mini --temperature 1 --max-tokens 2048
 
 | 옵션 | 기본값 | 설명 |
 | --- | --- | --- |
-| `--model` | `gpt-5-mini` | COPA에 전달할 모델명 |
+| `--model` | `gpt-5-mini` | OpenAI 호환 API에 전달할 모델명 |
 | `--temperature` | `1.0` | 생성 온도(0~2). GPT-5 계열에서는 기본값일 때 요청에서 생략하며, 다른 값을 지정하면 API 지원 여부에 따라 오류가 날 수 있습니다. |
 | `--max-tokens` | `2048` | 최대 생성 토큰 수(1~16384). GPT-5 계열에는 `max_completion_tokens`, 그 외 모델에는 `max_tokens`로 전달합니다. |
 | `--safe-mode` | 끔 | 전송 파일을 최대 10개, diff를 최대 200줄·30,000자로 제한합니다. |
 
-API 요청은 `POST https://copa.codyssey.kr/v1/chat/completions`로 전송하며 `Authorization: Bearer <virtual-key>` 헤더를 사용합니다. `commit`과 `pr`은 실행당 각각 API를 1회 호출합니다.
+API 요청 형식은 [OpenAI Chat Completions](https://developers.openai.com/api/reference/resources/chat/subresources/completions/methods/create)를 따릅니다. 요청은 제공된 주소인 `POST https://copa.codyssey.kr/v1/chat/completions`로 전송하며 `Authorization: Bearer <virtual-key>` 헤더를 사용합니다. `commit`과 `pr`은 실행당 각각 API를 1회 호출합니다.
 
 ## 출력 예시
 
@@ -46,7 +46,7 @@ API 요청은 `POST https://copa.codyssey.kr/v1/chat/completions`로 전송하�
 --- Commit Message ---
 feat: Git 변경 사항으로 커밋 초안 생성
 
-- main.py에 Git diff 수집과 COPA API 호출 추가
+- main.py에 Git diff 수집과 OpenAI 호환 API 호출 추가
 - README.md에 실행 방법과 안전 모드 설명 추가
 ```
 
@@ -59,7 +59,7 @@ feat: AI 기반 커밋·PR 초안 생성 기능 추가
 - 변경 사항을 일관된 형식으로 설명하기 위해 초안 생성이 필요합니다.
 
 ## What
-- Git 상태와 diff를 수집해 COPA API로 전달합니다.
+- Git 상태와 diff를 수집해 OpenAI 호환 API로 전달합니다.
 
 ## How to Test
 - `python3 main.py commit`과 `python3 main.py pr`의 출력을 확인합니다.
@@ -89,4 +89,4 @@ feat: AI 기반 커밋·PR 초안 생성 기능 추가
 python3 -m unittest discover -s tests -v
 ```
 
-단위 테스트는 임시 Git 리포지토리와 가짜 API 응답을 사용합니다. 실제 COPA 호출 확인에는 본인의 virtual key가 필요합니다.
+단위 테스트는 임시 Git 리포지토리와 가짜 API 응답을 사용합니다. 실제 API 호출 확인에는 본인의 virtual key가 필요합니다.

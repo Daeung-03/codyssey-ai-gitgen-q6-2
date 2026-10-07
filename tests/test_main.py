@@ -1,4 +1,4 @@
-"""Tests for Git input, output validation, and the COPA request shape."""
+"""Tests for Git input, output validation, and the OpenAI-compatible request shape."""
 
 from __future__ import annotations
 
@@ -69,7 +69,7 @@ class GitInputTests(unittest.TestCase):
 
 
 class OutputAndAPITests(unittest.TestCase):
-    def test_copa_chat_completions_request(self) -> None:
+    def test_chat_completions_request(self) -> None:
         api_response = {"choices": [{"message": {"content": '{"title":"feat: add CLI"}'}}]}
         with patch("main.urllib.request.urlopen") as urlopen:
             urlopen.return_value = io.BytesIO(json.dumps(api_response).encode("utf-8"))
