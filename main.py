@@ -14,6 +14,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+from dotenv import load_dotenv
+
 
 API_URL = "https://copa.codyssey.kr/v1/chat/completions"
 DEFAULT_MODEL = "gpt-5-mini"
@@ -321,9 +323,10 @@ def main(argv: list[str] | None = None) -> int:
         print(f"[INFO] Git diff 수집 완료: {len(changes.diff.splitlines())}줄")
         for note in changes.notes:
             print(f"[INFO] {note}")
+        load_dotenv(dotenv_path=Path.cwd() / ".env", override=False)
         key = os.environ.get("AI_API_KEY", "").strip()
         if not key:
-            raise CLIError('AI_API_KEY 환경변수가 없습니다. 예: export AI_API_KEY="YOUR_KEY"')
+            raise CLIError("AI_API_KEY가 없습니다. .env.example을 .env로 복사하고 키를 입력하세요.")
         print("[INFO] AI API 요청 중... (호출 횟수: 1)")
         response = call_api(
             key, args.model, args.temperature, args.max_tokens, build_messages(args.command, changes)

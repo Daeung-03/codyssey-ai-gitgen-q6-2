@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import io
 import json
+import os
 import subprocess
 import tempfile
 import unittest
@@ -69,6 +70,20 @@ class GitInputTests(unittest.TestCase):
 
 
 class OutputAndAPITests(unittest.TestCase):
+    def test_main_loads_key_from_env_file_and_preserves_environment(self) -> None:
+        changes = main.Changes(("main.py",), " M main.py", "diff", ())
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / ".env").write_text('AI_API_KEY="file-key"\n', encoding="utf-8")
+            for environment, expected in (({}, "file-key"), ({"AI_API_KEY": "shell-key"}, "shell-key")):
+                with self.subTest(environment=environment), patch.dict(os.environ, environment, clear=True), \
+                        patch("main.Path.cwd", return_value=root), \
+                        patch("main.collect_changes", return_value=changes), \
+                        patch("main.call_api", return_value='{"title":"test"}') as api, \
+                        patch("sys.stdout", new_callable=io.StringIO):
+                    self.assertEqual(main.main(["commit"]), 0)
+                    self.assertEqual(api.call_args.args[0], expected)
+
     def test_chat_completions_request(self) -> None:
         api_response = {"choices": [{"message": {"content": '{"title":"feat: add CLI"}'}}]}
         with patch("main.urllib.request.urlopen") as urlopen:

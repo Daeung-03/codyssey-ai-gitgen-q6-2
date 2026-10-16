@@ -8,13 +8,22 @@ Git 변경 사항을 읽어 OpenAI 호환 Chat Completions API로 커밋 메시�
 - 제공받은 virtual key
 - 이 프로젝트를 독립적인 Git 리포지토리로 구성하고 **리포지토리 루트**에서 실행
 
-외부 Python 패키지는 필요하지 않습니다. API 키는 환경변수로 설정합니다.
+가상환경을 만들고 필요한 패키지를 설치한 뒤, 예제 설정을 복사합니다.
 
 ```sh
-export AI_API_KEY="YOUR_VIRTUAL_KEY"
+python3 -m venv .venv
+source .venv/bin/activate
+python3 -m pip install -r requirements.txt
+cp .env.example .env
 ```
 
-키를 `.env`나 소스 코드에 기록하지 마세요. `.env` 파일은 `.gitignore`에 포함되어 있습니다.
+`.env`를 열어 `AI_API_KEY`에 제공받은 virtual key를 입력하세요.
+
+```dotenv
+AI_API_KEY=YOUR_VIRTUAL_KEY
+```
+
+실행 시 현재 리포지토리 루트의 `.env`를 자동으로 읽습니다. 이미 설정된 환경변수가 있으면 그 값을 우선합니다. 실제 키가 들어 있는 `.env`는 Git에서 제외되며, `.env.example`에는 실제 키를 넣지 마세요.
 
 ## 실행
 
